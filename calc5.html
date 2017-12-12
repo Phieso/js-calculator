@@ -1,0 +1,201 @@
+
+
+<html>
+    <head>
+
+        <style>
+            html{ font-size: 24px;}
+            button { width:7em; height:7em; }
+            input { width: 100%; height:7em; }
+            .main { margin:3em auto; background: #B5B5B5; padding: 2em 1em; display: inline-block; }
+        </style>
+    </head>
+    <body>
+        <div class="main">
+
+            <table>
+                <div class="line"></div>
+                <tr>
+                    <td colspan="6"><input id="text" name="text" disabled></td>
+                </tr>
+                <tr>
+                    <td><button value="7" class="number">7</button></td>
+                    <td><button value="8" class="number">8</button></td>
+                    <td><button value="9" class="number">9</button></td>
+                    <td><button value="+" class="operator">+</button></td>
+                </tr>
+                <tr>
+                    <td><button value="4" class="number">4</button></td>
+                    <td><button value="5" class="number">5</button></td>
+                    <td><button value="6" class="number">6</button></td>
+                    <td><button value="-" class="operator">-</button></td>
+                </tr>
+                <tr>
+                    <td><button value="1" class="number">1</button></td>
+                    <td><button value="2" class="number">2</button></td>
+                    <td><button value="3" class="number">3</button></td>
+                    <td><button value="*" class="operator">*</button></td>
+                </tr>
+                <tr>
+                    <td colspan=""><button value="0" class="number" style="width:100%;">0</button></td>         
+                    <td colspan=""><button id="rmchar"><</button></td> 
+                    <td colspan=""><button id="cancel">C</button></td>      
+                    <td><button id="exe">=</button></td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <h1></h1>
+            <div style="width: 60%;color:#fff; position:absolute;top:0; right:0; height:100%; background:rgb(197, 197, 230);">
+                    <iframe style="height:50%; overflow:scroll; width:100%;" src="code_calculette.txt"></iframe>
+                    <iframe style="height:50%; overflow:scroll; width:100%;" src="code_calculette2.txt"></iframe>
+            </div>
+            
+        </div>
+    </body>
+    <script>
+    var result = 0;    var result = 0;
+    var val1 = document.querySelector("#val1");
+
+    var val2 = document.querySelector("#val2");
+    var line = document.querySelector(".line");
+    var text = document.querySelector("#text");
+    var exe = document.querySelector("#exe");
+    var main = document.querySelector(".main");
+    var cancel = document.querySelector("#cancel");
+    var rmchar = document.querySelector("#rmchar");
+    var alreadycalc = false;
+    var classNamee = "";
+    var valuekey = "";
+    var update_log = function(e){
+    
+       
+       if(e.type != 'click')
+       {
+            if(!isNaN(e.key))
+            {
+                classNamee = "number"; 
+                valuekey = e.key;
+            }
+            else if((e.key == "*")||(e.key == "-")||(e.key == "+"))
+            {
+                classNamee = "operator"; 
+                valuekey = e.key;
+            }
+            console.log("keysaisie  "+e.key);
+            
+       }
+       else
+       {
+            classNamee = e.toElement.className;
+            valuekey = e.toElement.value;
+       }
+
+       //alert(valuekey);    
+       var currentcharClass = classNamee;
+       var lastchar = text.value.charAt(text.value.length-1);
+       //console.log(exe);
+
+       if((currentcharClass == "operator")||(currentcharClass == "number"))
+       {
+           
+            //Double operateur interdit
+            if( ((currentcharClass == "operator")&&((lastchar == '*')||(lastchar == '+')||(lastchar == '-')) )||((currentcharClass=="operator")&&(text.value.length == 0)))
+            {
+
+            }
+            else
+            {
+                
+                if(classNamee == "number")
+                {
+                    if(alreadycalc == true){
+                        text.value = "";
+                        line.innerHTML = "";    
+                        alreadycalc = false;
+                    }
+                    var newchar = parseInt(valuekey);
+                    exe.disabled = false;
+                    exe.style.visibility= "visible";
+                }
+                else
+                {
+                    if(alreadycalc == true)
+                    {
+
+                        alreadycalc = false;
+                        
+                        //alert(result_calc+", class="+e.toElement.className);
+                        //newchar = result_calc + e.toElement.value;
+                    }
+                    var newchar = valuekey;
+                    exe.disabled = true;
+                    exe.style.visibility= "hidden";
+                }
+            line.innerHTML = line.innerHTML + newchar;
+            text.value = text.value + newchar;
+            return text.value + newchar;
+            }
+       }
+    }
+
+    var calc = function(e){
+        if(text.value != "")
+        {
+        text.value = eval(text.value);  
+        alreadycalc = true; 
+        exe.disabled = true;
+        exe.style.visibility= "hidden";
+        } 
+    }
+
+    var rmcharf = function(e){
+
+            if(alreadycalc == true)
+            {
+                text.value = line.innerHTML;
+                alreadycalc = false;
+            }
+            else
+            {   
+                lastchar = text.value.charAt(text.value.length-2);     
+                if((lastchar == "*")||(lastchar == "+")||(lastchar == "-"))
+                {
+                            exe.disabled = true;
+                            exe.style.visibility= "hidden";
+                }
+                else
+                {
+                        exe.disabled = false;
+                        exe.style.visibility= "visible";
+                }
+                text.value = text.value.slice(0, text.value.length-1);
+                line.innerHTML = line.innerHTML.slice(0, line.innerHTML.length-1);
+            }        
+    }
+
+    var keyboard_input = function(e){
+          
+            if(e.key == "Backspace")
+            {
+                rmcharf();
+            }
+            else if(e.key == "Enter")
+            {
+                calc();
+            }
+            else if(
+            ((e.key == "*")||(e.key == "-")||(e.key == "+"))||(!isNaN(e.key)) )
+            {
+                update_log(e);
+            }
+
+    }
+
+    this.main.addEventListener('click',update_log);
+    exe.addEventListener('click',calc);
+    cancel.addEventListener('click', function(){ text.value= ""; line.innerHTML = ""; } );;    
+    rmchar.addEventListener('click', rmcharf );
+    this.addEventListener('keyup',keyboard_input);
+    </script>
+</html>

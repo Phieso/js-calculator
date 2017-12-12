@@ -1,0 +1,145 @@
+    <script>
+    var result = 0;    var result = 0;
+<script>   
+    var val1 = document.querySelector("#val1");
+    var val2 = document.querySelector("#val2");
+    var line = document.querySelector(".line");
+    var text = document.querySelector("#text");
+    var exe = document.querySelector("#exe");
+    var main = document.querySelector(".main");
+    var cancel = document.querySelector("#cancel");
+    var rmchar = document.querySelector("#rmchar");
+    var alreadycalc = false;
+    var classNamee = "";
+    var valuekey = "";
+    var update_log = function(e){
+    
+       
+       if(e.type != 'click')
+       {
+            if(!isNaN(e.key))
+            {
+                classNamee = "number"; 
+                valuekey = e.key;
+            }
+            else if((e.key == "*")||(e.key == "-")||(e.key == "+"))
+            {
+                classNamee = "operator"; 
+                valuekey = e.key;
+            }
+            console.log("keysaisie  "+e.key);
+            
+       }
+       else
+       {
+            classNamee = e.toElement.className;
+            valuekey = e.toElement.value;
+       }
+
+       //alert(valuekey);    
+       var currentcharClass = classNamee;
+       var lastchar = text.value.charAt(text.value.length-1);
+       //console.log(exe);
+
+       if((currentcharClass == "operator")||(currentcharClass == "number"))
+       {
+           
+            //Double operateur interdit
+            if( ((currentcharClass == "operator")&&((lastchar == '*')||(lastchar == '+')||(lastchar == '-')) )||((currentcharClass=="operator")&&(text.value.length == 0)))
+            {
+
+            }
+            else
+            {
+                
+                if(classNamee == "number")
+                {
+                    if(alreadycalc == true){
+                        text.value = "";
+                        line.innerHTML = "";    
+                        alreadycalc = false;
+                    }
+                    var newchar = parseInt(valuekey);
+                    exe.disabled = false;
+                    exe.style.visibility= "visible";
+                }
+                else
+                {
+                    if(alreadycalc == true)
+                    {
+
+                        alreadycalc = false;
+                        
+                        //alert(result_calc+", class="+e.toElement.className);
+                        //newchar = result_calc + e.toElement.value;
+                    }
+                    var newchar = valuekey;
+                    exe.disabled = true;
+                    exe.style.visibility= "hidden";
+                }
+            line.innerHTML = line.innerHTML + newchar;
+            text.value = text.value + newchar;
+            return text.value + newchar;
+            }
+       }
+    }
+
+    var calc = function(e){
+        if(text.value != "")
+        {
+        text.value = eval(text.value);  
+        alreadycalc = true; 
+        exe.disabled = true;
+        exe.style.visibility= "hidden";
+        } 
+    }
+
+    var rmcharf = function(e){
+
+            if(alreadycalc == true)
+            {
+                text.value = line.innerHTML;
+                alreadycalc = false;
+            }
+            else
+            {   
+                lastchar = text.value.charAt(text.value.length-2);     
+                if((lastchar == "*")||(lastchar == "+")||(lastchar == "-"))
+                {
+                            exe.disabled = true;
+                            exe.style.visibility= "hidden";
+                }
+                else
+                {
+                        exe.disabled = false;
+                        exe.style.visibility= "visible";
+                }
+                text.value = text.value.slice(0, text.value.length-1);
+                line.innerHTML = line.innerHTML.slice(0, line.innerHTML.length-1);
+            }        
+    }
+
+    var keyboard_input = function(e){
+          
+            if(e.key == "Backspace")
+            {
+                rmcharf();
+            }
+            else if(e.key == "Enter")
+            {
+                calc();
+            }
+            else if(
+            ((e.key == "*")||(e.key == "-")||(e.key == "+"))||(!isNaN(e.key)) )
+            {
+                update_log(e);
+            }
+
+    }
+
+    this.main.addEventListener('click',update_log);
+    exe.addEventListener('click',calc);
+    cancel.addEventListener('click', function(){ text.value= ""; line.innerHTML = ""; } );;    
+    rmchar.addEventListener('click', rmcharf );
+    this.addEventListener('keyup',keyboard_input);
+    </script>
